@@ -1,0 +1,29 @@
+import { createTRPCReact } from "@trpc/react-query";
+import { httpLink } from "@trpc/client";
+import type { AppRouter } from "@/backend/trpc/app-router";
+import superjson from "superjson";
+import Constants from "expo-constants";
+
+export const trpc = createTRPCReact<AppRouter>();
+
+const getBaseUrl = (): string => {
+  const extra = (Constants?.expoConfig?.extra ?? {}) as Record<string, unknown>;
+  const fromExtra = typeof extra.EXPO_PUBLIC_RORK_API_BASE_URL === "string" ? (extra.EXPO_PUBLIC_RORK_API_BASE_URL as string) : undefined;
+  const fromEnv = typeof process.env.EXPO_PUBLIC_RORK_API_BASE_URL === "string" ? process.env.EXPO_PUBLIC_RORK_API_BASE_URL : undefined;
+  const base = fromExtra || fromEnv;
+  if (typeof base === "string" && base.length > 0) {
+    return base;
+  }
+  throw new Error(
+    "Missing EXPO_PUBLIC_RORK_API_BASE_URL. Define it in app.json under expo.extra or export it in your shell env."
+  );
+};
+
+export const trpcClient = trpc.createClient({
+  links: [
+    httpLink({
+      url: `${getBaseUrl()}/api/trpc`,
+      transformer: superjson,
+    }),
+  ],
+});

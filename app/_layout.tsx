@@ -1,0 +1,74 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { FitnessProvider } from "@/contexts/FitnessContext";
+import { SocialProvider } from "@/contexts/SocialContext";
+import { GroupsProvider } from "@/contexts/GroupsContext";
+import { trpc, trpcClient } from "@/lib/trpc";
+import { MotivationProvider } from "@/contexts/MotivationContext";
+import { HealthSyncProvider } from "@/contexts/HealthSyncContext";
+import Colors from "@/constants/colors";
+
+SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
+
+function RootLayoutNav() {
+  return (
+    <Stack screenOptions={{ 
+      headerBackTitle: "Back",
+      headerShown: true,
+      headerStyle: {
+        backgroundColor: Colors.background,
+      },
+      headerTintColor: Colors.text,
+    }}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  const [appIsReady, setAppIsReady] = React.useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppIsReady(true);
+        await SplashScreen.hideAsync();
+      }
+    }
+
+    prepare();
+  }, []);
+
+  if (!appIsReady) {
+    return null;
+  }
+
+  return (
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <FitnessProvider>
+          <SocialProvider>
+            <GroupsProvider>
+              <MotivationProvider>
+                <HealthSyncProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <RootLayoutNav />
+                  </GestureHandlerRootView>
+                </HealthSyncProvider>
+              </MotivationProvider>
+            </GroupsProvider>
+          </SocialProvider>
+        </FitnessProvider>
+      </QueryClientProvider>
+    </trpc.Provider>
+  );
+}
