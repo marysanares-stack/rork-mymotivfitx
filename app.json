@@ -1,4 +1,5 @@
-{
+
+     {
   "expo": {
     "extra": {
       "googleMapsApiKey": "AIzaSyA6NwwFszAlJv0_78pjzrXVLkE-XNjR9tg",
@@ -13,7 +14,8 @@
     "slug": "my-motiv-fit-x-sjp96bi",
     "packagerOpts": {
       "packageManager": "npm"
-     }, "version": "1.0.0",
+    },
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rork-app",
@@ -92,8 +94,6 @@
           "icon": "./local/assets/notification_icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
-          
-          
           "enableBackgroundRemoteNotifications": false
         }
       ],
