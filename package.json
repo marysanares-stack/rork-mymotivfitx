@@ -2,6 +2,19 @@
   "name": "expo-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "overrides": {
+    "lucide-react-native": {
+      "react": "19.1.0"
+    }
+  },
+  "dependencies": {
+    "react": "19.1.0",
+    "lucide-react-native": "^0.475.0",
+    }
+  },
+  "dependencies": {
+    "react": "19.1.0",
+    "lucide-react-native": "^0.475.0",
   "scripts": {
     "start": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --tunnel",
     "start-web": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --web --tunnel",
