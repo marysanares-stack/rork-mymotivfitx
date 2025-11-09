@@ -1,4 +1,4 @@
 @rork:registry=https://registry.rork.com/
-//registry.rork.com/:_authToken=$COMMAND
+//registry.rork.com/:_authToken=$RORK_AUTH_TOKEN
 
 
