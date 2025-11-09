@@ -1,1 +1,4 @@
-legacy-peer-deps=true
+@rork:registry=https://registry.rork.com/
+//registry.rork.com/:_authToken=$COMMAND
+
+
