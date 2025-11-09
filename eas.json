@@ -1,28 +1,12 @@
 {
-  "cli": {
-    "version": ">= 16.26.0",
-    "appVersionSource": "remote"
-  },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
     "production": {
-      "autoIncrement": true,
-      "env": {
-        "NPM_TOKEN": " "
-      },
-      "ios": {
-        "resourceClass": "medium"
-      },
       "android": {
         "resourceClass": "medium"
+      },
+      "ios": {
+        "resourceClass": "large"
       }
     }
-    "production": {}
   }
 }
