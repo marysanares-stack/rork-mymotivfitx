@@ -67,9 +67,7 @@
   "scripts": {
     "start": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --tunnel",
     "start-web": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --web --tunnel",
-    "start-web-dev": "DEBUG=expo* bunx rork start -p 1y5s6hzjlx3ofbfng4vui --web --tunnel",
+    "start-web-dev": "DEBUG=expo* bunx rork start -p 1y5s6hzjlx3ofbfbfng4vui --web --tunnel",
     "lint": "expo lint",
-    "postinstall": "npm config set @rork:registry https://registry.rork.com/ && npm config set //registry.rork.com/:_authToken $COMMAND"
+    "postinstall": "npm config set @rork:registry https://registry.rork.com/ && npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
   },
-  "private": true
-}
