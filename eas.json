@@ -2,6 +2,7 @@
   "cli": {
     "version": ">= 16.26.0",
     "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -13,7 +14,21 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "COMMAND": " "
+        "RORK_AUTH_TOKEN": " "
+      },
+      "ios": {
+        "resourceClass": "m-medium",
+        "preInstall": [
+          "npm config set @rork:registry https://registry.rork.com/",
+          "npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
+        ]
+      },
+      "android": {
+        "resourceClass": "m-medium",
+        "preInstall": [
+          "npm config set @rork:registry https://registry.rork.com/",
+          "npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
+        ]
       }
     }
   },
