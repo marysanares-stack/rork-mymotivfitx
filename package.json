@@ -63,6 +63,7 @@
     "eslint": "9.31.0",
     "eslint-config-expo": "9.2.0",
     "typescript": "~5.9.2"
+  },
   "scripts": {
     "start": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --tunnel",
     "start-web": "bunx rork start -p 1y5s6hzjlx3ofbfng4vui --web --tunnel",
@@ -70,3 +71,5 @@
     "lint": "expo lint",
     "postinstall": "npm config set @rork:registry https://registry.rork.com/ && npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
   },
+  "private": true
+}
