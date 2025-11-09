@@ -13,22 +13,11 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "RORK_AUTH_TOKEN": " "
-      },
-      "ios": {
-        "resourceClass": "m-medium",
-        "resourceClass": "m-medium",
-        "preInstall": [
-          "npm config set @rork:registry https://registry.rork.com/",
-          "npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
-        ]
-      },
-      "android": {
-        "resourceClass": "m-medium",
-        "preInstall": [
-          "npm config set @rork:registry https://registry.rork.com/",
-          "npm config set //registry.rork.com/:_authToken $RORK_AUTH_TOKEN"
-        ]
+        "COMMAND": " "
       }
     }
   },
+  "submit": {
+    "production": {}
+  }
+}
