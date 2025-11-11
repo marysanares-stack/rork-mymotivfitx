@@ -1,6 +1,9 @@
 {
   "build": {
     "production": {
+      "env": {
+        "RORK_AUTH_TOKEN": "@RORK_AUTH_TOKEN"
+      },
       "android": {
         "resourceClass": "medium"
       },
