@@ -9,6 +9,15 @@
       "ios": {
         "resourceClass": "large"
       }
+    },
+    "internal": {
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "medium"
+      },
+      "android": {
+        "resourceClass": "medium"
+      }
     }
   }
 }

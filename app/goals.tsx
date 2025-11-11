@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, type DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/colors';
@@ -29,6 +29,8 @@ export default function GoalsScreen() {
   const [value, setValue] = useState<string>('');
 
   const sortedGoals = useMemo(() => [...goals].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()), [goals]);
+
+  const percent = (n: number): DimensionValue => `${n}%` as unknown as DimensionValue;
 
   const startEdit = (preset: typeof goalPresets[number], goal?: Goal) => {
     if (goal) {
@@ -90,7 +92,7 @@ export default function GoalsScreen() {
             </View>
           )}
 
-          {sortedGoals.map((g) => {
+          {sortedGoals.map((g: Goal) => {
             const Icon = goalPresets.find(p => p.type === g.type)?.icon ?? TrendingUp;
             const progress = getGoalProgress(g);
             return (
@@ -110,7 +112,7 @@ export default function GoalsScreen() {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${progress.percentage.toFixed(1)}%` }]} />
+                  <View style={[styles.progressFill, { width: percent(parseFloat(progress.percentage.toFixed(1))) }]} />
                 </View>
                 <Text style={styles.progressLabel}>
                   {progress.currentValue} / {g.targetValue} {g.unit}

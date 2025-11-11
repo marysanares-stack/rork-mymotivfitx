@@ -1,0 +1,12 @@
+{
+  "name": "mymotivfitx-backend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "hono": "^4.10.4",
+    "@hono/trpc-server": "^0.4.0",
+    "@trpc/server": "^11.7.1",
+    "superjson": "^2.2.5",
+    "zod": "^3.23.8"
+  }
+}

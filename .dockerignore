@@ -1,0 +1,3 @@
+# Ignore Fly.io state
+.fly/
+fly.toml.bak

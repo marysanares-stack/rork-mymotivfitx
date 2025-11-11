@@ -12,10 +12,7 @@
     },
     "name": "MyMotivFitX",
     "slug": "my-motiv-fit-x-sjp96bi",
-    "packagerOpts": {
-      "packageManager": "npm"
-    },
-  "version": "1.0.2",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rork-app",
@@ -29,7 +26,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.rork.MyMotivFitX-sjp96bi",
-      "deploymentTarget": "15.1",
       "buildNumber": "2",
       "config": {
         "usesNonExemptEncryption": false

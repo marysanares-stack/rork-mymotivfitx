@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Animated,
+  Easing,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,16 +23,19 @@ import {
   Gift,
   Trophy,
   Medal,
+  Search,
+  X,
 } from 'lucide-react-native';
 import { useSocial } from '@/contexts/SocialContext';
 import Colors from '@/constants/colors';
 import { ACTIVITY_TYPES } from '@/mocks/data';
-import { SocialPost } from '@/types';
+import { SocialPost, User } from '@/types';
 
 export default function SocialScreen() {
   const insets = useSafeAreaInsets();
-  const { friends, socialPosts, likePost } = useSocial();
+  const { friends, socialPosts, likePost, noFriendsBannerDismissed, dismissNoFriendsBanner } = useSocial();
   const router = useRouter();
+  const bannerOpacity = useRef(new Animated.Value(1)).current;
 
   const getActivityTypeInfo = (type: string) => {
     return ACTIVITY_TYPES.find(a => a.value === type) || ACTIVITY_TYPES[0];
@@ -295,6 +300,13 @@ export default function SocialScreen() {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.headerButton}
+            onPress={() => router.push('/friend-search')}
+            testID="friend-search-button"
+          >
+            <Search size={18} color={Colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
             onPress={() => router.push('/challenges')}
             testID="challenges-button"
           >
@@ -324,6 +336,38 @@ export default function SocialScreen() {
         </View>
       </View>
 
+      {friends.length === 0 && !noFriendsBannerDismissed && (
+        <Animated.View style={[styles.noFriendsBanner, { opacity: bannerOpacity }]}>
+          <TouchableOpacity
+            onPress={() => {
+              Animated.timing(bannerOpacity, {
+                toValue: 0,
+                duration: 200,
+                easing: Easing.out(Easing.ease),
+                useNativeDriver: true,
+              }).start(() => { void dismissNoFriendsBanner(); });
+            }}
+            style={styles.noFriendsDismiss}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss no friends banner"
+            testID="no-friends-dismiss"
+          >
+            <X size={16} color={Colors.textSecondary} />
+          </TouchableOpacity>
+          <Text style={styles.noFriendsTitle}>You haven’t added any friends yet</Text>
+          <Text style={styles.noFriendsText}>
+            Find friends to see their activities, celebrate milestones, and stay motivated together.
+          </Text>
+          <TouchableOpacity
+            style={styles.noFriendsButton}
+            onPress={() => router.push('/friend-search')}
+            testID="no-friends-cta"
+          >
+            <Text style={styles.noFriendsButtonText}>Find Friends</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
       {friends.length > 0 && (
         <View style={styles.friendsSection}>
           <ScrollView
@@ -331,7 +375,7 @@ export default function SocialScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.friendsList}
           >
-            {friends.map((friend) => (
+            {friends.map((friend: User) => (
               <TouchableOpacity key={friend.id} style={styles.friendItem}>
                 <View style={styles.friendAvatar}>
                   {friend.avatar && (friend.avatar.startsWith('http') || friend.avatar.startsWith('data:')) ? (
@@ -365,7 +409,7 @@ export default function SocialScreen() {
             </Text>
           </View>
         ) : (
-          socialPosts.map((post) => renderPost(post))
+          socialPosts.map((post: SocialPost) => renderPost(post))
         )}
       </ScrollView>
     </View>
@@ -375,6 +419,47 @@ export default function SocialScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  noFriendsBanner: {
+    marginHorizontal: 20,
+    marginBottom: 8,
+    backgroundColor: Colors.cardBg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    gap: 8,
+  },
+  noFriendsDismiss: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 6,
+    borderRadius: 999,
+  },
+  noFriendsTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  noFriendsText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  noFriendsButton: {
+    marginTop: 4,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  noFriendsButtonText: {
+    color: Colors.white,
+    fontWeight: '600' as const,
+    fontSize: 14,
   },
   header: {
     flexDirection: 'row',

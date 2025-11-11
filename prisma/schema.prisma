@@ -1,0 +1,41 @@
+// Prisma schema for MyMotivFitX backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  avatar     String?
+  avatarUrl  String?
+  weight     Float?
+  height     Float?
+  age        Int?
+  gender     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  friendsAsUser  Friendship[] @relation("user_friend")
+  friendsAsOther Friendship[] @relation("friend_user")
+}
+
+// Friendship is stored directionally to keep implementation simple.
+// We will create and delete both directions for a mutual friendship.
+model Friendship {
+  id        String   @id @default(cuid())
+  user      User     @relation("user_friend", fields: [userId], references: [id])
+  userId    String
+  friend    User     @relation("friend_user", fields: [friendId], references: [id])
+  friendId  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId])
+}
