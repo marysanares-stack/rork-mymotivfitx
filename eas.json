@@ -1,6 +1,9 @@
 {
   "build": {
     "production": {
+      "hooks": {
+        "pre-install": "bash ./eas-build-pre-install.sh"
+      },
       "env": {
         "RORK_AUTH_TOKEN": "@RORK_AUTH_TOKEN"
       },

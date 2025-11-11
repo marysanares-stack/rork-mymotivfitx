@@ -13,7 +13,7 @@ import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Send, User, Bot, Dumbbell, Target, Info } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { useRorkAgent, createRorkTool } from '@rork/toolkit-sdk';
+import { useRorkAgent, createRorkTool } from '@/lib/rork-toolkit-stub';
 import { z } from 'zod';
 import { useFitness } from '@/contexts/FitnessContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
