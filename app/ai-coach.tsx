@@ -52,7 +52,13 @@ export default function AICoachScreen() {
             difficulty: toolInput.difficulty,
             duration: toolInput.duration,
             category: 'mixed',
-            exercises: toolInput.exercises.map(ex => ({
+            exercises: toolInput.exercises.map((ex: {
+              name: string;
+              sets?: number;
+              reps?: number;
+              duration?: number;
+              notes?: string;
+            }) => ({
               id: generateId(),
               name: ex.name,
               sets: ex.sets,

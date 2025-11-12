@@ -28,6 +28,7 @@ export interface Activity {
 
 export interface User {
   id: string;
+  backendId?: string; // persisted backend record id
   name: string;
   email: string;
   avatar: string;

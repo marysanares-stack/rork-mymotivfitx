@@ -50,14 +50,23 @@ export default function ProfileScreen() {
     addWaterIntake,
     addMood,
     updateAvatar,
+    updateUserProfile,
   } = useFitness();
 
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showMoodModal, setShowMoodModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newWeight, setNewWeight] = useState('');
   const [weightNotes, setWeightNotes] = useState('');
   const [avatarTab, setAvatarTab] = useState<'emoji' | 'ai' | 'upload'>('emoji');
+  const [showFriendSearchHint, setShowFriendSearchHint] = useState(false);
+  const [editName, setEditName] = useState(user.name || '');
+  const [editEmail, setEditEmail] = useState(user.email || '');
+  const [editWeight, setEditWeight] = useState(user.weight ? String(user.weight) : '');
+  const [editHeight, setEditHeight] = useState(user.height ? String(user.height) : '');
+  const [editAge, setEditAge] = useState(user.age ? String(user.age) : '');
+  const [editGender, setEditGender] = useState<'male' | 'female' | 'other' | undefined>(user.gender);
 
   const waterIntake = getTodayWaterIntake();
   const todayMood = getTodayMood();
@@ -93,6 +102,28 @@ export default function ProfileScreen() {
 
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <TouchableOpacity
+            style={styles.findFriendsButton}
+            onPress={() => router.push('/friend-search')}
+          >
+            <Text style={styles.findFriendsButtonText}>Find Friends</Text>
+          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => {
+            setEditName(user.name || '');
+            setEditEmail(user.email || '');
+            setEditWeight(user.weight ? String(user.weight) : '');
+            setEditHeight(user.height ? String(user.height) : '');
+            setEditAge(user.age ? String(user.age) : '');
+            setEditGender(user.gender);
+            setShowEditModal(true);
+          }}
+        >
+          <Text style={styles.editButtonText}>Edit</Text>
+        </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -118,6 +149,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.userEmail}>{user.email}</Text>
+          
         </View>
 
         <View style={styles.statsRow}>
@@ -323,6 +355,109 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <Modal
+        visible={showEditModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Profile</Text>
+              <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalBody}>
+              <Text style={styles.inputLabel}>Name</Text>
+              <TextInput
+                style={styles.input}
+                value={editName}
+                onChangeText={setEditName}
+                placeholder="Your name"
+                placeholderTextColor={Colors.textMuted}
+              />
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={editEmail}
+                onChangeText={setEditEmail}
+                placeholder="you@example.com"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <Text style={styles.inputLabel}>Weight (lbs)</Text>
+              <TextInput
+                style={styles.input}
+                value={editWeight}
+                onChangeText={setEditWeight}
+                placeholder="165"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="decimal-pad"
+              />
+              <Text style={styles.inputLabel}>Height (inches)</Text>
+              <TextInput
+                style={styles.input}
+                value={editHeight}
+                onChangeText={setEditHeight}
+                placeholder="68"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputLabel}>Age</Text>
+              <TextInput
+                style={styles.input}
+                value={editAge}
+                onChangeText={setEditAge}
+                placeholder="30"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputLabel}>Gender</Text>
+              <View style={styles.genderRow}>
+                {(['male','female','other'] as const).map(g => (
+                  <TouchableOpacity
+                    key={g}
+                    style={[styles.genderPill, editGender === g && styles.genderPillActive]}
+                    onPress={() => setEditGender(g)}
+                  >
+                    <Text style={[styles.genderPillText, editGender === g && styles.genderPillTextActive]}>
+                      {g.charAt(0).toUpperCase() + g.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity
+                style={[styles.submitBtn, !editName && styles.submitBtnDisabled]}
+                disabled={!editName}
+                onPress={async () => {
+                  await updateUserProfile({
+                    name: editName.trim(),
+                    email: editEmail.trim(),
+                    weight: editWeight ? parseFloat(editWeight) : undefined,
+                    height: editHeight ? parseInt(editHeight) : undefined,
+                    age: editAge ? parseInt(editAge) : undefined,
+                    gender: editGender,
+                  });
+                  setShowEditModal(false);
+                }}
+              >
+                <LinearGradient
+                  colors={[Colors.primary, Colors.purple]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.submitGradient}
+                >
+                  <Text style={styles.submitText}>Save Profile</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
         visible={showAvatarModal}
         animationType="slide"
         transparent
@@ -524,6 +659,29 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: Colors.text,
   },
+  editButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surfaceLight,
+  },
+  editButtonText: {
+    color: Colors.text,
+    fontWeight: '600' as const,
+  },
+  findFriendsButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: Colors.primary,
+  },
+  findFriendsButtonText: {
+    color: Colors.white,
+    fontWeight: '600' as const,
+  },
+  
   quickSettings: {
     backgroundColor: Colors.cardBg,
     borderRadius: 16,
@@ -908,6 +1066,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700' as const,
     color: Colors.white,
+  },
+  genderRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  genderPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surfaceLight,
+  },
+  genderPillActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '20',
+  },
+  genderPillText: {
+    color: Colors.textSecondary,
+    fontWeight: '600' as const,
+  },
+  genderPillTextActive: {
+    color: Colors.primary,
   },
   moodOptions: {
     flexDirection: 'row',

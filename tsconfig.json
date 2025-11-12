@@ -13,5 +13,12 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "exclude": [
+    "backend/**",
+    "rork-mymotivfitx/**",
+    "rork-mymotivfitx_backup/**",
+    "ios/**",
+    "node_modules/**"
   ]
 }

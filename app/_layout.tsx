@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -10,12 +10,25 @@ import { trpc, trpcClient } from "@/lib/trpc";
 import { MotivationProvider } from "@/contexts/MotivationContext";
 import { HealthSyncProvider } from "@/contexts/HealthSyncContext";
 import Colors from "@/constants/colors";
+import { useFitness } from "@/contexts/FitnessContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
+  const { user, isLoading } = useFitness();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (isLoading) return;
+    const needsOnboarding = !user?.name || !user?.email;
+    if (needsOnboarding && pathname !== "/onboarding") {
+      router.replace("/onboarding");
+    }
+  }, [isLoading, user?.name, user?.email, pathname, router]);
+
   return (
     <Stack screenOptions={{ 
       headerBackTitle: "Back",
@@ -26,6 +39,8 @@ function RootLayoutNav() {
       headerTintColor: Colors.text,
     }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+      <Stack.Screen name="friend-search" options={{ title: 'Find Friends' }} />
     </Stack>
   );
 }
