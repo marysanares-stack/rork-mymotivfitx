@@ -52,6 +52,9 @@
     "react-native-web": "^0.21.0",
     "superjson": "^2.2.5",
     "zod": "^4.1.12",
+    "@sentry/react": "^8.0.0",
+    "@sentry/react-native": "^5.0.0",
+    "@sentry/node": "^8.0.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

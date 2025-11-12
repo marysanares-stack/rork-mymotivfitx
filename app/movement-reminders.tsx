@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { Clock, Bell, BellOff } from 'lucide-react-native';

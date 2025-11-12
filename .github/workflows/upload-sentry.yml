@@ -1,0 +1,58 @@
+name: Upload Sentry Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      eas_build_id:
+        description: 'EAS build id to download (optional)'
+        required: false
+  push:
+    branches: [ main ]
+
+jobs:
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup sentry-cli
+        uses: getsentry/action-setup-sentry-cli@v2
+        with:
+          sentry-cli-version: latest
+
+      - name: Setup Node & EAS CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install eas-cli
+        run: npm install -g eas-cli@3 || true
+
+      - name: Download EAS artifacts (if EXPO_TOKEN provided)
+        if: ${{ secrets.EXPO_TOKEN != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_BUILD_ID: ${{ github.event.inputs.eas_build_id || github.sha }}
+        run: |
+          set -euo pipefail
+          echo "Using EAS_BUILD_ID=$EAS_BUILD_ID"
+          # Try to download the ipa and dsym; these commands are best-effort and may fail depending on EAS configuration
+          mkdir -p ./eas-artifacts
+          if [ -n "$EAS_BUILD_ID" ]; then
+            # download IPA (if available)
+            eas build:download --platform ios --id "$EAS_BUILD_ID" --output ./eas-artifacts/artifact.ipa || true
+            # attempt to download dsym (eas-cli offers type flag on some versions)
+            eas build:download --platform ios --id "$EAS_BUILD_ID" --type dsym --output ./eas-artifacts/artifact-dsym.zip || true
+          fi
+
+      - name: Run EAS post-build uploader
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          EAS_BUILD_ID: ${{ github.event.inputs.eas_build_id || github.sha }}
+          DSYM_DOWNLOAD_URL: ${{ secrets.DSYM_DOWNLOAD_URL }}
+        run: |
+          chmod +x ./scripts/upload-to-sentry.sh ./scripts/eas-post-build.sh
+          ./scripts/eas-post-build.sh

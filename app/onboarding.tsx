@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -67,7 +67,7 @@ export default function OnboardingScreen() {
 
         {step === 0 && (
           <View style={styles.section}>
-            <Text style={styles.paragraph}>Welcome to MyMotivFitX! Let's set up your profile so we can personalize your experience.</Text>
+            <Text style={styles.paragraph}>Welcome to MyMotivFitX! Let us set up your profile so we can personalize your experience.</Text>
           </View>
         )}
 

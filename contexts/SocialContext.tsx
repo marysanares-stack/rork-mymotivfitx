@@ -1,5 +1,5 @@
 import createContextHook from '@nkzw/create-context-hook';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, SocialPost, Activity, Sticker, Gift, Challenge, ChallengeProgress, LeaderboardEntry, LeaderboardPeriod, LeaderboardMetric } from '@/types';
 import { useFitness } from './FitnessContext';
@@ -53,7 +53,8 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
   const [challengeProgress, setChallengeProgress] = useState<ChallengeProgress[]>([]);
   const [noFriendsBannerDismissed, setNoFriendsBannerDismissed] = useState<boolean>(false);
   const fitness = useFitness();
-  const { earnedBadges, recentActivities, user, activities, dailyStats } = fitness;
+  const { earnedBadges, recentActivities, user, activities, updateUserProfile } = fitness;
+  const isFitnessLoading = fitness.isLoading;
 
   const generateSocialPosts = useCallback(() => {
     const posts: SocialPost[] = [];
@@ -104,21 +105,21 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
 
   useEffect(() => {
     if (friendsQuery.data) {
-      setFriends(friendsQuery.data as unknown as User[]);
+      const data = friendsQuery.data as unknown as User[];
+      setFriends(data);
       // Update fitness user.friends with friend IDs for badge logic
-      const friendIds = (friendsQuery.data as any[]).map((f: any) => f.id);
+      const friendIds = data.map((f: any) => f.id);
       if (JSON.stringify(friendIds) !== JSON.stringify(user.friends)) {
-        void fitness.updateUserProfile({ friends: friendIds } as any);
+        void updateUserProfile({ friends: friendIds } as any);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [friendsQuery.data]);
+  }, [friendsQuery.data, updateUserProfile, user.friends]);
 
   useEffect(() => {
-    if (!fitness.isLoading && earnedBadges && recentActivities) {
+    if (!isFitnessLoading && earnedBadges && recentActivities) {
       generateSocialPosts();
     }
-  }, [fitness.isLoading, earnedBadges, recentActivities, generateSocialPosts]);
+  }, [isFitnessLoading, earnedBadges, recentActivities, generateSocialPosts, fitness]);
 
   // Load persisted dismissal state per user
   useEffect(() => {
@@ -128,7 +129,7 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
         const key = `${STORAGE_PREFIX.NO_FRIENDS_DISMISSED}:${user.id}`;
         const val = await AsyncStorage.getItem(key);
         setNoFriendsBannerDismissed(val === 'true');
-      } catch (e) {
+      } catch {
         // non-fatal
       }
     };
@@ -141,7 +142,7 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
       setNoFriendsBannerDismissed(true);
       const key = `${STORAGE_PREFIX.NO_FRIENDS_DISMISSED}:${user.id}`;
       await AsyncStorage.setItem(key, 'true');
-    } catch (e) {
+    } catch {
       // non-fatal
     }
   }, [user?.id]);
@@ -203,7 +204,7 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
       comments: [],
     };
   setSocialPosts((prev: SocialPost[]) => [post, ...prev]);
-  }, [stickers, user]);
+  }, [stickers, user, friends]);
 
   // Friend management mutations
   const addFriendMutation = trpc.user.friends.add.useMutation();
@@ -222,21 +223,19 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
   }, [backendId, removeFriendMutation, friendsQuery]);
 
   useEffect(() => {
-    loadChallenges();
+    (async () => {
+      try {
+        const [challengesData, progressData] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.CHALLENGES),
+          AsyncStorage.getItem(STORAGE_KEYS.CHALLENGE_PROGRESS),
+        ]);
+        if (challengesData) setChallenges(JSON.parse(challengesData));
+        if (progressData) setChallengeProgress(JSON.parse(progressData));
+      } catch (error) {
+        console.error('Error loading challenges:', error);
+      }
+    })();
   }, []);
-
-  const loadChallenges = async () => {
-    try {
-      const [challengesData, progressData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.CHALLENGES),
-        AsyncStorage.getItem(STORAGE_KEYS.CHALLENGE_PROGRESS),
-      ]);
-      if (challengesData) setChallenges(JSON.parse(challengesData));
-      if (progressData) setChallengeProgress(JSON.parse(progressData));
-    } catch (error) {
-      console.error('Error loading challenges:', error);
-    }
-  };
 
   const createChallenge = useCallback(async (challenge: Challenge) => {
     const updated = [...challenges, challenge];
@@ -271,7 +270,7 @@ export const [SocialProvider, useSocial] = createContextHook(() => {
 
     const start = new Date(challenge.startDate).getTime();
     const end = new Date(challenge.endDate).getTime();
-    const now = new Date().getTime();
+    
 
     const relevantActivities = activities.filter((a: Activity) => {
       const activityDate = new Date(a.date).getTime();
