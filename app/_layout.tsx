@@ -3,14 +3,13 @@ import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { FitnessProvider } from "@/contexts/FitnessContext";
+import { FitnessProvider , useFitness } from "@/contexts/FitnessContext";
 import { SocialProvider } from "@/contexts/SocialContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
 import { trpc, trpcClient } from "@/lib/trpc";
 import { MotivationProvider } from "@/contexts/MotivationContext";
 import { HealthSyncProvider } from "@/contexts/HealthSyncContext";
 import Colors from "@/constants/colors";
-import { useFitness } from "@/contexts/FitnessContext";
 
 SplashScreen.preventAutoHideAsync();
 
