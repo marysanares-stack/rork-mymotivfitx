@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import {
   View,
   Text,
@@ -116,7 +117,7 @@ type DataType = {
   id: string;
   name: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   enabled: boolean;
   syncDirection: 'both' | 'import' | 'export';

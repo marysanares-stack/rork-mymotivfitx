@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Share2, Twitter, Facebook, MessageCircle, Copy, Check } from 'lucide-react-native';
 import { Image } from 'expo-image';
@@ -18,7 +18,7 @@ import { useFitness } from '@/contexts/FitnessContext';
 
 export default function ShareAchievementScreen() {
   const { badgeId } = useLocalSearchParams<{ badgeId?: string }>();
-  const router = useRouter();
+  // router not used in this screen — removed to clear lint warning
   const { earnedBadges } = useFitness();
   const [copied, setCopied] = useState(false);
 

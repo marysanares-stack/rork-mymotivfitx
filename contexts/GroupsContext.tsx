@@ -63,7 +63,7 @@ export const [GroupsProvider, useGroups] = createContextHook(() => {
       AsyncStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(updated));
       return updated;
     });
-  }, [activities.length]);
+  }, [activities]);
 
   const createGroup = useCallback((name: string, description?: string, memberIds?: string[]) => {
     const newGroup: Group = {
@@ -282,7 +282,7 @@ export const [GroupsProvider, useGroups] = createContextHook(() => {
       AsyncStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(updated));
       return updated;
     });
-  }, [activities.length]);
+  }, [activities]);
 
   const getGroupChallenges = useCallback((groupId: string): GroupChallenge[] => {
     return challenges.filter(c => c.groupId === groupId);

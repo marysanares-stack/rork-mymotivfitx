@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { ReactElement } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator, ScrollView } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -156,7 +157,7 @@ export default function SyncScreen() {
   );
 }
 
-function SummaryCard({ renderIcon, title, value, unit, loading, testID }: { renderIcon: () => React.ReactElement; title: string; value: number; unit: string; loading: boolean; testID: string }) {
+function SummaryCard({ renderIcon, title, value, unit, loading, testID }: { renderIcon: () => ReactElement; title: string; value: number; unit: string; loading: boolean; testID: string }) {
   return (
     <View style={styles.summaryCard} testID={testID}>
       <View style={styles.summaryHeader}>

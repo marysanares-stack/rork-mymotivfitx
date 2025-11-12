@@ -4,11 +4,21 @@
       "env": {},
       "node": "22.11.0",
       "android": { "resourceClass": "medium" },
-      "ios": { "resourceClass": "large" }
+      "ios": { "resourceClass": "large" },
+      "hooks": {
+        "post-build": {
+          "file": "./scripts/eas-post-build.sh"
+        }
+      }
     },
     "internal": {
       "distribution": "internal",
       "ios": { "resourceClass": "medium" },
+      "hooks": {
+        "post-build": {
+          "file": "./scripts/eas-post-build.sh"
+        }
+      },
       "android": { "resourceClass": "medium" }
     }
   },

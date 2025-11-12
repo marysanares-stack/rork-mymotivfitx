@@ -8,10 +8,9 @@ const isDev = __DEV__ === true;
 export function logEvent(eventName: string, params?: Params) {
   if (isDev) {
     // Keep logs concise to avoid noise in production builds
-    try {
-      // eslint-disable-next-line no-console
-      console.log(`[analytics] ${eventName}`, params ? JSON.stringify(params) : '');
-    } catch {
+      try {
+        console.log(`[analytics] ${eventName}`, params ? JSON.stringify(params) : '');
+      } catch {
       // ignore serialization errors
     }
   }

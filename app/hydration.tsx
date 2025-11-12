@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -151,7 +151,7 @@ export default function HydrationScreen() {
       'Time to hydrate! 💧 Drink some water',
       'Stay hydrated! Your body needs water 💦',
       'Hydration reminder: Drink a glass of water 🥤',
-      "Don't forget to drink water! 💙",
+  'Do not forget to drink water! 💙',
       'Keep your body hydrated! Time for water 💧',
     ];
 

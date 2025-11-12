@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Activity, Calendar, TrendingUp, Dumbbell, Timer, Zap, ChevronRight } from 'lucide-react-native';
+import { Activity, Calendar, TrendingUp, Dumbbell, Timer, Zap } from 'lucide-react-native';
 import { useFitness } from '@/contexts/FitnessContext';
 import Colors from '@/constants/colors';
 
@@ -20,7 +20,7 @@ type TimeFilter = '7d' | '30d' | '90d' | 'all';
 
 export default function WorkoutHistoryScreen() {
   const insets = useSafeAreaInsets();
-  const { recentWorkoutSessions, activities, workoutPlans } = useFitness();
+  const { recentWorkoutSessions, activities } = useFitness();
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('30d');
 
   const getFilteredData = () => {

@@ -58,7 +58,7 @@ type TextPart = { type: 'text'; text: string };
 type AgentMessage = {
   id: string;
   role: 'user' | 'assistant';
-  parts: Array<TextPart | ToolPart>;
+  parts: (TextPart | ToolPart)[];
 };
 
 type UseRorkAgentOptions = {
