@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -70,15 +70,34 @@ export default function PeriodTrackingScreen() {
     loadData();
   }, []);
 
-  const saveData = useCallback(async () => {
+  useEffect(() => {
+    if (cycleData.entries.length > 0) {
+      saveData();
+      calculatePredictions();
+    }
+  }, [cycleData.entries]);
+
+  const loadData = async () => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        setCycleData(parsed);
+      }
+    } catch (error) {
+      console.error('Error loading period data:', error);
+    }
+  };
+
+  const saveData = async () => {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cycleData));
     } catch (error) {
       console.error('Error saving period data:', error);
     }
-  }, [cycleData]);
+  };
 
-  const calculatePredictions = useCallback(() => {
+  const calculatePredictions = () => {
     if (cycleData.entries.length < 2) return;
 
     const sortedEntries = [...cycleData.entries].sort((a, b) => 
@@ -108,34 +127,14 @@ export default function PeriodTrackingScreen() {
     const ovulationDate = new Date(lastPeriodDate);
     ovulationDate.setDate(ovulationDate.getDate() + Math.floor(avgCycleLength / 2));
 
-    setCycleData(prev => ({
-      ...prev,
+    setCycleData({
+      ...cycleData,
       averageCycleLength: avgCycleLength,
       lastPeriod: lastEntry,
       nextPredicted: nextPeriodDate.toISOString(),
       ovulationPredicted: ovulationDate.toISOString(),
-    }));
-  }, [cycleData.entries]);
-
-  useEffect(() => {
-    if (cycleData.entries.length > 0) {
-      saveData();
-      calculatePredictions();
-    }
-  }, [cycleData.entries, saveData, calculatePredictions]);
-
-  const loadData = async () => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) {
-        const parsed = JSON.parse(data);
-        setCycleData(parsed);
-      }
-    } catch (error) {
-      console.error('Error loading period data:', error);
-    }
+    });
   };
-
 
   const startPeriod = () => {
     const newEntry: PeriodEntry = {

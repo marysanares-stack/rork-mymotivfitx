@@ -1,9 +1,9 @@
 import createContextHook from '@nkzw/create-context-hook';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { Activity, DailyStats, WeightEntry, WaterIntake, Mood, Badge, User, SleepEntry, MovementReminderSettings, Goal, GoalProgress, ActivityType, WorkoutPlan, WorkoutSession } from '@/types';
+import { Activity, DailyStats, WeightEntry, WaterIntake, Mood, Badge, User, SleepEntry, MovementReminderSettings, Goal, GoalProgress, GoalType, ActivityType, WorkoutPlan, WorkoutSession, Exercise } from '@/types';
 import { currentUser, MOTIVATIONAL_QUOTES } from '@/mocks/data';
 import { trpc } from '@/lib/trpc';
 
@@ -59,180 +59,83 @@ export const [FitnessProvider, useFitness] = createContextHook(() => {
     notificationIds: [],
   });
 
-  // Load persisted data once on mount. Inline the IIFE so ESLint can verify
-  // dependencies easily and we avoid a stale function reference.
   useEffect(() => {
-    (async () => {
-      try {
-        const [userData, activitiesData, weightData, waterData, moodsData, badgesData, statsData, sleepData, reminderData, goalsData, plansData, sessionsData] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEYS.USER),
-          AsyncStorage.getItem(STORAGE_KEYS.ACTIVITIES),
-          AsyncStorage.getItem(STORAGE_KEYS.WEIGHT),
-          AsyncStorage.getItem(STORAGE_KEYS.WATER),
-          AsyncStorage.getItem(STORAGE_KEYS.MOODS),
-          AsyncStorage.getItem(STORAGE_KEYS.BADGES),
-          AsyncStorage.getItem(STORAGE_KEYS.STATS),
-          AsyncStorage.getItem(STORAGE_KEYS.SLEEP),
-          AsyncStorage.getItem(STORAGE_KEYS.MOVEMENT_REMINDERS),
-          AsyncStorage.getItem(STORAGE_KEYS.GOALS),
-          AsyncStorage.getItem(STORAGE_KEYS.WORKOUT_PLANS),
-          AsyncStorage.getItem(STORAGE_KEYS.WORKOUT_SESSIONS),
-        ]);
-
-        if (userData) {
-          try {
-            const parsed = JSON.parse(userData) as User;
-            // Ensure friends array is defined
-            setUser({ ...currentUser, ...parsed, friends: parsed.friends ?? currentUser.friends ?? [] });
-          } catch {}
-        }
-
-        if (activitiesData) setActivities(JSON.parse(activitiesData));
-        if (weightData) setWeightEntries(JSON.parse(weightData));
-        if (waterData) setWaterIntakes(JSON.parse(waterData));
-        if (moodsData) setMoods(JSON.parse(moodsData));
-        if (badgesData) {
-          const loadedBadges = JSON.parse(badgesData);
-          const iconMap: Record<string, string> = {
-            'badge-steps-10k': 'https://r2-pub.rork.com/generated-images/90590078-d07d-47ef-b5a0-f0c48dc31aaa.png',
-            'badge-steps-streak-7': 'https://r2-pub.rork.com/generated-images/5c02807b-e46c-49b3-ad85-11a812f7b9a7.png',
-            'badge-weight-loss-10': 'https://r2-pub.rork.com/generated-images/3ba5f10e-b480-4086-8aff-d5e7499ab192.png',
-            'badge-calories-5000': 'https://r2-pub.rork.com/generated-images/3fefad56-ea29-45a2-b68a-bc4b3354e991.png',
-            'badge-water-30': 'https://r2-pub.rork.com/generated-images/866c4c46-6e75-44f3-9002-ad0f0b6b3209.png',
-            'badge-social-butterfly': 'https://r2-pub.rork.com/generated-images/90a0a0a6-66df-4a6a-8e23-8d7b13b9e265.png',
-            'badge-top-poster': 'https://r2-pub.rork.com/generated-images/6ad1b4d9-7bd3-44fd-a932-fc68e8c8e7ec.png',
-            'badge-motivator': 'https://r2-pub.rork.com/generated-images/171a9c0a-0f56-4bf8-b114-d72655392d0a.png',
-          };
-          const cleanedBadges = loadedBadges.map((badge: Badge) => {
-            return { ...badge, icon: iconMap[badge.id] || badge.icon };
-          });
-          setBadges(cleanedBadges);
-          await AsyncStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cleanedBadges));
-        } else {
-          initializeBadges();
-        }
-        if (statsData) setDailyStats(JSON.parse(statsData));
-        if (sleepData) setSleepEntries(JSON.parse(sleepData));
-        if (goalsData) setGoals(JSON.parse(goalsData));
-        if (plansData) setWorkoutPlans(JSON.parse(plansData));
-        if (sessionsData) setWorkoutSessions(JSON.parse(sessionsData));
-        if (reminderData) {
-          const settings = JSON.parse(reminderData);
-          setMovementReminderSettings(settings);
-          // Intentionally not scheduling notifications here so mount is quick;
-          // scheduling will occur when user enables/updates reminders.
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    loadData();
   }, []);
-
-  // Recompute badges when relevant inputs change. Memoize the function so
-  // it can be safely referenced by effects without triggering ESLint.
-  const getTodayStats = useCallback((): DailyStats => {
-    const today = new Date().toISOString().split('T')[0];
-    return dailyStats.find((s: DailyStats) => s.date === today) || {
-      date: today,
-      steps: 0,
-      calories: 0,
-      activeMinutes: 0,
-      distance: 0,
-      waterIntake: 0,
-    };
-  }, [dailyStats]);
-
-  const getActivityStreak = useCallback((): number => {
-    const sortedDates = Array.from(new Set(activities.map((a: Activity) => a.date.split('T')[0]))).sort().reverse();
-    let streak = 0;
-    const today = new Date();
-    for (let i = 0; i < sortedDates.length; i++) {
-      const expectedDate = new Date(today);
-      expectedDate.setDate(today.getDate() - i);
-      const expectedDateStr = expectedDate.toISOString().split('T')[0];
-      if (sortedDates[i] === expectedDateStr) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }, [activities]);
-
-  const getWeightLoss = useCallback((): number => {
-    if (weightEntries.length < 2) return 0;
-    const sorted = [...weightEntries].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    return sorted[0].weight - sorted[sorted.length - 1].weight;
-  }, [weightEntries]);
-
-  const getTotalCalories = useCallback((): number => {
-    return activities.reduce((sum: number, a: Activity) => sum + a.calories, 0);
-  }, [activities]);
-
-  const getWaterGoalDays = useCallback((): number => {
-    return waterIntakes.filter((w: WaterIntake) => w.amount >= w.goal).length;
-  }, [waterIntakes]);
-
-  const checkBadges = useMemo(() => {
-    return () => {
-      const updated = badges.map((badge: Badge) => {
-        if (badge.earned) return badge;
-
-        let shouldEarn = false;
-
-        switch (badge.type) {
-          case 'steps': {
-            const todayStats = getTodayStats();
-            shouldEarn = todayStats.steps >= badge.requirement;
-            break;
-          }
-          case 'consecutive_days': {
-            const streak = getActivityStreak();
-            shouldEarn = streak >= badge.requirement;
-            break;
-          }
-          case 'weight_loss': {
-            const loss = getWeightLoss();
-            shouldEarn = loss >= badge.requirement;
-            break;
-          }
-          case 'calories': {
-            const total = getTotalCalories();
-            shouldEarn = total >= badge.requirement;
-            break;
-          }
-          case 'water': {
-            const days = getWaterGoalDays();
-            shouldEarn = days >= badge.requirement;
-            break;
-          }
-          case 'friends': {
-            const friendCount = user.friends?.length || 0;
-            shouldEarn = friendCount >= badge.requirement;
-            break;
-          }
-        }
-
-        if (shouldEarn) {
-          return { ...badge, earned: true, earnedDate: new Date().toISOString() };
-        }
-        return badge;
-      });
-
-      setBadges(updated);
-      AsyncStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(updated));
-    };
-  }, [badges, user.friends, getActivityStreak, getTodayStats, getTotalCalories, getWaterGoalDays, getWeightLoss]);
 
   useEffect(() => {
     if (!isLoading && badges.length > 0) {
       checkBadges();
     }
-  }, [isLoading, badges.length, checkBadges]);
+  }, [user.friends, isLoading]);
 
-  
+  const loadData = async () => {
+    try {
+      const [userData, activitiesData, weightData, waterData, moodsData, badgesData, statsData, sleepData, reminderData, goalsData, plansData, sessionsData] = await Promise.all([
+        AsyncStorage.getItem(STORAGE_KEYS.USER),
+        AsyncStorage.getItem(STORAGE_KEYS.ACTIVITIES),
+        AsyncStorage.getItem(STORAGE_KEYS.WEIGHT),
+        AsyncStorage.getItem(STORAGE_KEYS.WATER),
+        AsyncStorage.getItem(STORAGE_KEYS.MOODS),
+        AsyncStorage.getItem(STORAGE_KEYS.BADGES),
+        AsyncStorage.getItem(STORAGE_KEYS.STATS),
+        AsyncStorage.getItem(STORAGE_KEYS.SLEEP),
+        AsyncStorage.getItem(STORAGE_KEYS.MOVEMENT_REMINDERS),
+        AsyncStorage.getItem(STORAGE_KEYS.GOALS),
+        AsyncStorage.getItem(STORAGE_KEYS.WORKOUT_PLANS),
+        AsyncStorage.getItem(STORAGE_KEYS.WORKOUT_SESSIONS),
+      ]);
+
+      if (userData) {
+        try {
+          const parsed = JSON.parse(userData) as User;
+          // Ensure friends array is defined
+          setUser({ ...currentUser, ...parsed, friends: parsed.friends ?? currentUser.friends ?? [] });
+        } catch {}
+      }
+
+      if (activitiesData) setActivities(JSON.parse(activitiesData));
+      if (weightData) setWeightEntries(JSON.parse(weightData));
+      if (waterData) setWaterIntakes(JSON.parse(waterData));
+      if (moodsData) setMoods(JSON.parse(moodsData));
+      if (badgesData) {
+        const loadedBadges = JSON.parse(badgesData);
+        const iconMap: Record<string, string> = {
+          'badge-steps-10k': 'https://r2-pub.rork.com/generated-images/90590078-d07d-47ef-b5a0-f0c48dc31aaa.png',
+          'badge-steps-streak-7': 'https://r2-pub.rork.com/generated-images/5c02807b-e46c-49b3-ad85-11a812f7b9a7.png',
+          'badge-weight-loss-10': 'https://r2-pub.rork.com/generated-images/3ba5f10e-b480-4086-8aff-d5e7499ab192.png',
+          'badge-calories-5000': 'https://r2-pub.rork.com/generated-images/3fefad56-ea29-45a2-b68a-bc4b3354e991.png',
+          'badge-water-30': 'https://r2-pub.rork.com/generated-images/866c4c46-6e75-44f3-9002-ad0f0b6b3209.png',
+          'badge-social-butterfly': 'https://r2-pub.rork.com/generated-images/90a0a0a6-66df-4a6a-8e23-8d7b13b9e265.png',
+          'badge-top-poster': 'https://r2-pub.rork.com/generated-images/6ad1b4d9-7bd3-44fd-a932-fc68e8c8e7ec.png',
+          'badge-motivator': 'https://r2-pub.rork.com/generated-images/171a9c0a-0f56-4bf8-b114-d72655392d0a.png',
+        };
+        const cleanedBadges = loadedBadges.map((badge: Badge) => {
+          return { ...badge, icon: iconMap[badge.id] || badge.icon };
+        });
+        setBadges(cleanedBadges);
+        await AsyncStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(cleanedBadges));
+      } else {
+        initializeBadges();
+      }
+      if (statsData) setDailyStats(JSON.parse(statsData));
+      if (sleepData) setSleepEntries(JSON.parse(sleepData));
+      if (goalsData) setGoals(JSON.parse(goalsData));
+      if (plansData) setWorkoutPlans(JSON.parse(plansData));
+      if (sessionsData) setWorkoutSessions(JSON.parse(sessionsData));
+      if (reminderData) {
+        const settings = JSON.parse(reminderData);
+        setMovementReminderSettings(settings);
+        if (settings.enabled && Platform.OS !== 'web') {
+          await scheduleMovementReminders(settings);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // tRPC user mutations
   const createUserMutation = trpc.user.profile.create.useMutation();
@@ -262,7 +165,8 @@ export const [FitnessProvider, useFitness] = createContextHook(() => {
       }
     };
     void sync();
-  }, [isLoading, user.backendId, user, createUserMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
 
   const initializeBadges = () => {
     const initialBadges: Badge[] = [
@@ -460,9 +364,101 @@ export const [FitnessProvider, useFitness] = createContextHook(() => {
     AsyncStorage.setItem(STORAGE_KEYS.SLEEP, JSON.stringify(updated));
   };
 
-  
+  const checkBadges = () => {
+  const updated = badges.map((badge: Badge) => {
+      if (badge.earned) return badge;
 
-  
+      let shouldEarn = false;
+
+      switch (badge.type) {
+        case 'steps': {
+          const todayStats = getTodayStats();
+          shouldEarn = todayStats.steps >= badge.requirement;
+          break;
+        }
+        case 'consecutive_days': {
+          const streak = getActivityStreak();
+          shouldEarn = streak >= badge.requirement;
+          break;
+        }
+        case 'weight_loss': {
+          const loss = getWeightLoss();
+          shouldEarn = loss >= badge.requirement;
+          break;
+        }
+        case 'calories': {
+          const total = getTotalCalories();
+          shouldEarn = total >= badge.requirement;
+          break;
+        }
+        case 'water': {
+          const days = getWaterGoalDays();
+          shouldEarn = days >= badge.requirement;
+          break;
+        }
+        case 'friends': {
+          const friendCount = user.friends?.length || 0;
+          shouldEarn = friendCount >= badge.requirement;
+          break;
+        }
+      }
+
+      if (shouldEarn) {
+        return { ...badge, earned: true, earnedDate: new Date().toISOString() };
+      }
+      return badge;
+    });
+
+    setBadges(updated);
+    AsyncStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(updated));
+  };
+
+  const getTodayStats = (): DailyStats => {
+    const today = new Date().toISOString().split('T')[0];
+  return dailyStats.find((s: DailyStats) => s.date === today) || {
+      date: today,
+      steps: 0,
+      calories: 0,
+      activeMinutes: 0,
+      distance: 0,
+      waterIntake: 0,
+    };
+  };
+
+  const getActivityStreak = (): number => {
+  const sortedDates = Array.from(new Set(activities.map((a: Activity) => a.date.split('T')[0]))).sort().reverse();
+    let streak = 0;
+    const today = new Date();
+    
+    for (let i = 0; i < sortedDates.length; i++) {
+      const expectedDate = new Date(today);
+      expectedDate.setDate(today.getDate() - i);
+      const expectedDateStr = expectedDate.toISOString().split('T')[0];
+      
+      if (sortedDates[i] === expectedDateStr) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  const getWeightLoss = (): number => {
+    if (weightEntries.length < 2) return 0;
+    const sorted = [...weightEntries].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    return sorted[0].weight - sorted[sorted.length - 1].weight;
+  };
+
+  const getTotalCalories = (): number => {
+  return activities.reduce((sum: number, a: Activity) => sum + a.calories, 0);
+  };
+
+  const getWaterGoalDays = (): number => {
+  return waterIntakes.filter((w: WaterIntake) => w.amount >= w.goal).length;
+  };
 
   const getTodayWaterIntake = (): WaterIntake => {
     const today = new Date().toISOString().split('T')[0];
@@ -520,12 +516,12 @@ export const [FitnessProvider, useFitness] = createContextHook(() => {
     const today = new Date().toISOString().split('T')[0];
     switch (goal.type) {
       case 'steps_daily': {
-  const s = getTodayStats();
+        const s = getTodayStats();
         const current = s.steps;
         return { goalId: goal.id, currentValue: current, percentage: Math.min(100, (current / goal.targetValue) * 100), periodLabel: 'Today' };
       }
       case 'active_minutes_daily': {
-  const s = getTodayStats();
+        const s = getTodayStats();
         const current = s.activeMinutes;
         return { goalId: goal.id, currentValue: current, percentage: Math.min(100, (current / goal.targetValue) * 100), periodLabel: 'Today' };
       }
