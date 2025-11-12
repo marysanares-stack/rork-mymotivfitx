@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,9 +12,7 @@ import { ShieldAlert, Clock, Target, CheckCircle2, Star, TrendingUp } from 'luci
 import Colors from '@/constants/colors';
 import { useFitness } from '@/contexts/FitnessContext';
 
-
-
-interface Stretch {
+type Stretch = {
   id: string;
   name: string;
   duration: number;
@@ -24,7 +21,7 @@ interface Stretch {
   description: string;
   benefits: string[];
   recommended: boolean;
-}
+};
 
 const STRETCHES: Stretch[] = [
   {
@@ -204,7 +201,7 @@ export default function InjuryPreventionScreen() {
                 <ShieldAlert size={24} color={Colors.red} />
               </View>
               <View style={styles.activityInfo}>
-                <Text style={styles.activityTitle}>Today's Activity Level</Text>
+                <Text style={styles.activityTitle}>Today&apos;s Activity Level</Text>
                 <Text style={[styles.activityLevel, { 
                   color: activityLevel === 'high' ? Colors.red : activityLevel === 'moderate' ? Colors.orange : Colors.green 
                 }]}>
