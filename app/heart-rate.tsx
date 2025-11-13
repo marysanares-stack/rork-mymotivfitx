@@ -29,7 +29,7 @@ export default function HeartRateScreen() {
 
   // heartbeatScale and progressAnim are Animated.Value refs that are stable
   // across renders; we intentionally only react to changes in isScanning.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useEffect(() => {
     if (isScanning) {
       Animated.loop(

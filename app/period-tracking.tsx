@@ -66,10 +66,14 @@ export default function PeriodTrackingScreen() {
   const [selectedMood, setSelectedMood] = useState<string>('neutral');
   const [selectedFlow, setSelectedFlow] = useState<'light' | 'medium' | 'heavy'>('medium');
 
+  // loadData is intentionally called once on mount.
+   
   useEffect(() => {
     loadData();
   }, []);
 
+  // saveData / calculatePredictions are stable for our usage here; run when entries change.
+   
   useEffect(() => {
     if (cycleData.entries.length > 0) {
       saveData();

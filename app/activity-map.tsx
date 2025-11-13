@@ -93,7 +93,7 @@ function NativeMapView() {
   // requestLocationPermission is intentionally stable here and we only want
   // to run this module preload once on mount. Silencing exhaustive-deps
   // prevents a noisy lint warning while keeping behavior unchanged.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useEffect(() => {
     (async () => {
       try {

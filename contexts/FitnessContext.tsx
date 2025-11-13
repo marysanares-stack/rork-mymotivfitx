@@ -59,10 +59,14 @@ export const [FitnessProvider, useFitness] = createContextHook(() => {
     notificationIds: [],
   });
 
+  // We intentionally call loadData on mount only. loadData is stable in this module.
+   
   useEffect(() => {
     loadData();
   }, []);
 
+  // checkBadges is defined below and we only want to run this when friends or loading state changes.
+   
   useEffect(() => {
     if (!isLoading && badges.length > 0) {
       checkBadges();

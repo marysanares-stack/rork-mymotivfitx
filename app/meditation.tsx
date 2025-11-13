@@ -151,6 +151,9 @@ export default function MeditationScreen() {
   const totalSessions = completedSessions.length;
   const currentStreak = 7;
 
+  // Timer logic is intentionally driven by isActive and timeRemaining only.
+  // completeSession is stable within this module.
+   
   useEffect(() => {
     if (isActive && timeRemaining > 0) {
       timerRef.current = setTimeout(() => {
@@ -164,6 +167,8 @@ export default function MeditationScreen() {
     };
   }, [isActive, timeRemaining]);
 
+  // animateBreathing is defined below and we intentionally drive it from breathPhase/isActive.
+   
   useEffect(() => {
     if (selectedSession?.type === 'breathing' && isActive) {
       animateBreathing();

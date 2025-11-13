@@ -133,7 +133,7 @@ export default function HeartRateScreen() {
     
     setScanProgress(Math.min((elapsed / 15) * 100, 100));
 
-    const simulatedBPM = 65 + Math.sin(elapsed * 1.5) * 15;
+  const _simulatedBPM = 65 + Math.sin(elapsed * 1.5) * 15;
     const simulatedRed = 128 + Math.sin(frameCountRef.current * 0.1) * 20;
     redValuesRef.current.push(simulatedRed);
   };

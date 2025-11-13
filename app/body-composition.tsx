@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Dimensions,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
