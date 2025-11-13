@@ -1,10 +1,9 @@
 import { z } from 'zod';
 import { publicProcedure } from '../../../create-context';
 import { prisma } from '../../../../prisma/client';
-import { TRPCError } from '@trpc/server';
 
 // Optional: separate store for friend requests (not yet exposed via routes)
-// Placeholder removed to avoid unused variable warnings. Implement when needed.
+const friendRequestsStore = new Map();
 
 export default {
   list: publicProcedure
@@ -27,7 +26,7 @@ export default {
         prisma.user.findUnique({ where: { id: input.userId } }),
         prisma.user.findUnique({ where: { id: input.friendId } }),
       ]);
-      if (!user || !friend) throw new TRPCError({ code: 'NOT_FOUND', message: 'User or friend not found' });
+      if (!user || !friend) throw new Error('User or friend not found');
 
       // Create bidirectional friendship (ignore if already exists)
       await prisma.friendship.upsert({

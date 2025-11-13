@@ -8,11 +8,15 @@
   "dependencies": {
     "@ai-sdk/react": "^2.0.87",
     "@expo/vector-icons": "^15.0.3",
+    "@hono/node-server": "^1.19.6",
     "@hono/trpc-server": "^0.4.0",
     "@nkzw/create-context-hook": "^1.1.0",
     "@prisma/client": "^6.19.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
+    "@sentry/node": "^8.0.0",
+    "@sentry/react": "^8.0.0",
+    "@sentry/react-native": "^5.0.0",
     "@stardazed/streams-text-encoding": "^1.0.2",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@tanstack/react-query": "^5.90.6",
@@ -52,9 +56,6 @@
     "react-native-web": "^0.21.0",
     "superjson": "^2.2.5",
     "zod": "^4.1.12",
-    "@sentry/react": "^8.0.0",
-    "@sentry/react-native": "^5.0.0",
-    "@sentry/node": "^8.0.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
@@ -71,10 +72,14 @@
     "start-web-dev": "DEBUG=expo* bunx rork start -p 1y5s6hzjlx3ofbfng4vui --web --tunnel",
     "lint": "expo lint"
   },
-    "private": true,
-    "expo": {
-      "install": {
-        "exclude": ["react", "react-dom", "eslint-config-expo"]
-      }
+  "private": true,
+  "expo": {
+    "install": {
+      "exclude": [
+        "react",
+        "react-dom",
+        "eslint-config-expo"
+      ]
     }
+  }
 }
