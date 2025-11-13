@@ -243,7 +243,7 @@ export default function SocialExportScreen() {
           } else {
             Alert.alert('Content Ready', 'Please copy this content:\n\n' + message);
           }
-        } catch (err) {
+        } catch {
           console.log('Clipboard copy failed, showing content');
           Alert.alert('Content Ready', 'Please copy this content:\n\n' + message);
         }
@@ -293,7 +293,7 @@ export default function SocialExportScreen() {
           } else {
             Alert.alert('Content Ready', message);
           }
-        } catch (err) {
+        } catch {
           console.log('Clipboard copy failed, showing content');
           Alert.alert('Content Ready', message);
         }
@@ -441,7 +441,7 @@ export default function SocialExportScreen() {
               } else {
                 Alert.alert('Content Ready', composed);
               }
-            } catch (err) {
+            } catch {
               console.log('Clipboard copy failed, showing content');
               Alert.alert('Content Ready', composed);
             }
