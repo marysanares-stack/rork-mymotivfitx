@@ -1,5 +1,6 @@
-// Lightweight local stub to replace the private @rork/toolkit-sdk during builds
-// Provides minimal APIs used by the app: generateText, createRorkTool, useRorkAgent
+// Local replacement for the private @rork/toolkit-sdk used during development.
+// This file provides a small in-repo implementation of the APIs the app imports
+// so the project can typecheck and run in dev environments without the private package.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 

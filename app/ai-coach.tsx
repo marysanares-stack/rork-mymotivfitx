@@ -13,7 +13,7 @@ import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Send, User, Bot, Dumbbell, Target, Info } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { useRorkAgent, createRorkTool } from '@/lib/rork-toolkit-stub';
+import { useRorkAgent, createRorkTool } from '../lib/rork-toolkit-stub';
 import { z } from 'zod';
 import { useFitness } from '@/contexts/FitnessContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -45,7 +45,7 @@ export default function AICoachScreen() {
             notes: z.string().optional(),
           })).describe('List of exercises in the plan'),
         }),
-        async execute(toolInput) {
+  async execute(toolInput: any) {
           await addWorkoutPlan({
             name: toolInput.name,
             description: `${toolInput.description}\n\nFrequency: ${toolInput.frequency}`,
@@ -167,7 +167,7 @@ export default function AICoachScreen() {
           </View>
         )}
 
-        {messages.map((message) => (
+  {messages.map((message: any) => (
           <View
             key={message.id}
             style={[
@@ -193,7 +193,7 @@ export default function AICoachScreen() {
                 message.role === 'user' ? styles.userBubble : styles.assistantBubble,
               ]}
             >
-              {message.parts.map((part, idx) => {
+              {message.parts.map((part: any, idx: number) => {
                 if (part.type === 'text') {
                   return (
                     <Text

@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import createContextHook from "@nkzw/create-context-hook";
 import { useMutation } from "@tanstack/react-query";
-import { generateText } from "@/lib/rork-toolkit-stub";
+import { generateText } from "../lib/rork-toolkit-stub";
 
 export type MotivationPhrase = {
   id: string;
