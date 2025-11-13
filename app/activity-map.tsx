@@ -53,9 +53,7 @@ function WebFallback() {
 
       <View style={[styles.statsPanel, { paddingBottom: insets.bottom + 20 }]} testID="stats-panel">
         <Text style={styles.infoTitle}>Why this screen?</Text>
-        <Text style={styles.infoText}>
-          This feature uses native maps and precise location tracking that aren't available in the web preview.
-        </Text>
+        <Text style={styles.infoText}>{`This feature uses native maps and precise location tracking that aren't available in the web preview.`}</Text>
         <Text style={styles.infoText}>
           Scan the QR code in the preview to open the app on your phone and start tracking.
         </Text>

@@ -61,7 +61,7 @@ export default function FriendSearchScreen() {
           <View style={styles.loadingRow}><ActivityIndicator color={Colors.primary} /><Text style={styles.loadingText}>Searching...</Text></View>
         )}
         {!searchQuery.isLoading && submittedQuery.length > 1 && (searchQuery.data?.length === 0) && (
-          <Text style={styles.emptyText}>No users found for "{submittedQuery}"</Text>
+          <Text style={styles.emptyText}>{`No users found for "${submittedQuery}"`}</Text>
         )}
         {searchQuery.data?.map((u: any) => {
           const friend = isFriend(u.id);

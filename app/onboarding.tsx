@@ -67,7 +67,7 @@ export default function OnboardingScreen() {
 
         {step === 0 && (
           <View style={styles.section}>
-            <Text style={styles.paragraph}>Welcome to MyMotivFitX! Let's set up your profile so we can personalize your experience.</Text>
+            <Text style={styles.paragraph}>{`Welcome to MyMotivFitX! Let's set up your profile so we can personalize your experience.`}</Text>
           </View>
         )}
 
