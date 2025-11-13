@@ -90,6 +90,10 @@ function NativeMapView() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // requestLocationPermission is intentionally stable here and we only want
+  // to run this module preload once on mount. Silencing exhaustive-deps
+  // prevents a noisy lint warning while keeping behavior unchanged.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     (async () => {
       try {
