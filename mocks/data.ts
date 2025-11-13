@@ -1,4 +1,4 @@
-import { User } from '@/types';
+import { User, Activity, Badge, SocialPost, WeightEntry } from '@/types';
 
 export const ACTIVITY_TYPES = [
   { value: 'walking', label: 'Walking', emoji: '🚶', icon: 'https://r2-pub.rork.com/generated-images/a8511b46-03a5-461b-9c11-a3284386b3fe.png', color: '#10B981' },

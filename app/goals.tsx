@@ -1,4 +1,4 @@
-import { useMemo, useState, type ComponentType } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform, type DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
@@ -8,7 +8,7 @@ import { Goal, GoalType } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TrendingUp, Target, Footprints, Clock, HeartPulse, Dumbbell, Save, Trash2, Calendar, Route } from 'lucide-react-native';
 
-const goalPresets: { type: GoalType; title: string; unit: string; placeholder: string; icon: ComponentType<any>; period: string }[] = [
+const goalPresets: { type: GoalType; title: string; unit: string; placeholder: string; icon: React.ComponentType<any>; period: string }[] = [
   { type: 'weight_target', title: 'Target Weight', unit: 'lb', placeholder: 'e.g., 165', icon: Target, period: 'Anytime' },
   { type: 'steps_daily', title: 'Daily Steps', unit: 'steps', placeholder: 'e.g., 10000', icon: Footprints, period: 'Per day' },
   { type: 'active_minutes_daily', title: 'Active Minutes', unit: 'min', placeholder: 'e.g., 45', icon: Clock, period: 'Per day' },

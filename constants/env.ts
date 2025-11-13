@@ -1,7 +1,5 @@
 import Constants from 'expo-constants';
-// Ensure bundlers don't tree-shake expo constants usage; keep the access
-// expression for runtime evaluation.
-void Constants.expoConfig?.extra?.googleMapsApiKey;
+Constants.expoConfig?.extra?.googleMapsApiKey;
 export type AppExtra = {
 googleMapsApiKey: string;
 };

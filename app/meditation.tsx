@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -151,8 +151,31 @@ export default function MeditationScreen() {
   const totalSessions = completedSessions.length;
   const currentStreak = 7;
 
-  // Stable callbacks for effects
-  const animateBreathing = useCallback(() => {
+  // Timer logic is intentionally driven by isActive and timeRemaining only.
+  // completeSession is stable within this module.
+   
+  useEffect(() => {
+    if (isActive && timeRemaining > 0) {
+      timerRef.current = setTimeout(() => {
+        setTimeRemaining(timeRemaining - 1);
+      }, 1000);
+    } else if (timeRemaining === 0 && isActive) {
+      completeSession();
+    }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isActive, timeRemaining]);
+
+  // animateBreathing is defined below and we intentionally drive it from breathPhase/isActive.
+   
+  useEffect(() => {
+    if (selectedSession?.type === 'breathing' && isActive) {
+      animateBreathing();
+    }
+  }, [breathPhase, isActive, selectedSession]);
+
+  const animateBreathing = () => {
     if (!selectedSession || selectedSession.type !== 'breathing') return;
 
     const durations = {
@@ -186,42 +209,7 @@ export default function MeditationScreen() {
         }
       });
     }
-  }, [selectedSession, breathPhase, currentCycle, scaleAnim]);
-
-  const completeSession = useCallback(() => {
-    if (selectedSession) {
-      const completed: CompletedSession = {
-        sessionId: selectedSession.id,
-        sessionName: selectedSession.name,
-        duration: selectedSession.duration,
-        completedAt: new Date().toISOString(),
-      };
-      setCompletedSessions([completed, ...completedSessions]);
-    }
-    setIsActive(false);
-    setSelectedSession(null);
-  }, [selectedSession, completedSessions]);
-
-  
-
-  useEffect(() => {
-    if (isActive && timeRemaining > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1);
-      }, 1000);
-    } else if (timeRemaining === 0 && isActive) {
-      completeSession();
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isActive, timeRemaining, completeSession]);
-
-  useEffect(() => {
-    if (selectedSession?.type === 'breathing' && isActive) {
-      animateBreathing();
-    }
-  }, [breathPhase, isActive, selectedSession, animateBreathing]);
+  };
 
   const startSession = (session: Session) => {
     setSelectedSession(session);
@@ -250,6 +238,19 @@ export default function MeditationScreen() {
     if (breathTimerRef.current) clearTimeout(breathTimerRef.current);
   };
 
+  const completeSession = () => {
+    if (selectedSession) {
+      const completed: CompletedSession = {
+        sessionId: selectedSession.id,
+        sessionName: selectedSession.name,
+        duration: selectedSession.duration,
+        completedAt: new Date().toISOString(),
+      };
+      setCompletedSessions([completed, ...completedSessions]);
+    }
+    setIsActive(false);
+    setSelectedSession(null);
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

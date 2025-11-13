@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -277,7 +277,7 @@ export default function BodyCompositionScreen() {
               {weightTrend.direction === 'down' ? '-' : '+'}{weightTrend.change.toFixed(1)} kg
             </Text>
             <Text style={styles.infoDescription}>
-              {weightTrend.direction === 'down' ? 'You are making progress!' : 'Keep working toward your goals!'}
+              {weightTrend.direction === 'down' ? 'You\'re making progress!' : 'Keep working toward your goals!'}
             </Text>
           </View>
         )}
@@ -354,9 +354,7 @@ export default function BodyCompositionScreen() {
           <Info size={20} color={Colors.primary} />
           <View style={styles.infoBoxContent}>
             <Text style={styles.infoBoxTitle}>About These Calculations</Text>
-            <Text style={styles.infoBoxText}>
-              BMI is a simple screening tool. It does not measure body fat directly and may not be accurate for athletes with high muscle mass.
-            </Text>
+            <Text style={styles.infoBoxText}>{`BMI is a simple screening tool. It doesn't measure body fat directly and may not be accurate for athletes with high muscle mass.`}</Text>
             <Text style={styles.infoBoxText}>
               Body fat percentage provides a more complete picture. The Navy Method is reasonably accurate for most people.
             </Text>

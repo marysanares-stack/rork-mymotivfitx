@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -60,7 +60,7 @@ export default function ProfileScreen() {
   const [newWeight, setNewWeight] = useState('');
   const [weightNotes, setWeightNotes] = useState('');
   const [avatarTab, setAvatarTab] = useState<'emoji' | 'ai' | 'upload'>('emoji');
-  // removed unused friend-search hint state to satisfy lint (was unused)
+  const [showFriendSearchHint, setShowFriendSearchHint] = useState(false);
   const [editName, setEditName] = useState(user.name || '');
   const [editEmail, setEditEmail] = useState(user.email || '');
   const [editWeight, setEditWeight] = useState(user.weight ? String(user.weight) : '');

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TextInput,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,7 +28,7 @@ import { useFitness } from '@/contexts/FitnessContext';
 import Colors from '@/constants/colors';
 import { Exercise, WorkoutPlan } from '@/types';
 
-// width not used in this screen; removed to satisfy lint
+const { width } = Dimensions.get('window');
 
 type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 type WorkoutCategory = 'strength' | 'cardio' | 'flexibility' | 'mixed';
