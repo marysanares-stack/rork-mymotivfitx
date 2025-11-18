@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -53,9 +53,7 @@ function WebFallback() {
 
       <View style={[styles.statsPanel, { paddingBottom: insets.bottom + 20 }]} testID="stats-panel">
         <Text style={styles.infoTitle}>Why this screen?</Text>
-        <Text style={styles.infoText}>
-          This feature uses native maps and precise location tracking that are not available in the web preview.
-        </Text>
+        <Text style={styles.infoText}>{`This feature uses native maps and precise location tracking that aren't available in the web preview.`}</Text>
         <Text style={styles.infoText}>
           Scan the QR code in the preview to open the app on your phone and start tracking.
         </Text>
@@ -92,34 +90,10 @@ function NativeMapView() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const requestLocationPermission = useCallback(async () => {
-    try {
-      if (!LocationRuntime) return;
-      const { status: foregroundStatus } = await LocationRuntime.requestForegroundPermissionsAsync();
-      if (foregroundStatus !== 'granted') {
-        Alert.alert('Permission Required', 'Location permission is needed to track your activity');
-        return;
-      }
-      const location = await LocationRuntime.getCurrentPositionAsync({
-        accuracy: LocationRuntime.Accuracy.High,
-      });
-      setCurrentLocation(location);
-      if (mapRef.current && location) {
-        mapRef.current.animateToRegion(
-          {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          1000,
-        );
-      }
-    } catch (error) {
-      console.error('Error requesting location permission:', error);
-    }
-  }, [LocationRuntime]);
-
+  // requestLocationPermission is intentionally stable here and we only want
+  // to run this module preload once on mount. Silencing exhaustive-deps
+  // prevents a noisy lint warning while keeping behavior unchanged.
+   
   useEffect(() => {
     (async () => {
       try {
@@ -146,7 +120,35 @@ function NativeMapView() {
         clearInterval(timerRef.current);
       }
     };
-  }, [requestLocationPermission]);
+  }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      if (!LocationRuntime) return;
+      const { status: foregroundStatus } = await LocationRuntime.requestForegroundPermissionsAsync();
+      if (foregroundStatus !== 'granted') {
+        Alert.alert('Permission Required', 'Location permission is needed to track your activity');
+        return;
+      }
+      const location = await LocationRuntime.getCurrentPositionAsync({
+        accuracy: LocationRuntime.Accuracy.High,
+      });
+      setCurrentLocation(location);
+      if (mapRef.current && location) {
+        mapRef.current.animateToRegion(
+          {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000,
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+    }
+  };
 
   const startTracking = async () => {
     try {
@@ -287,7 +289,7 @@ function NativeMapView() {
       steps,
       notes: `Route tracked with ${routePoints.length} points. Elevation gain: ${Math.floor(stats.elevation)}m`,
     });
-  Alert.alert('Activity Saved!', `Great job! You have completed your ${getActivityLabel(selectedActivityType).toLowerCase()} activity.`, [{ text: 'OK', onPress: () => router.back() }]);
+    Alert.alert('Activity Saved!', `Great job! You've completed your ${getActivityLabel(selectedActivityType).toLowerCase()} activity.`, [{ text: 'OK', onPress: () => router.back() }]);
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {

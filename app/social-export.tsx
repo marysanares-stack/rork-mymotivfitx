@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -41,7 +40,7 @@ type ShareableContent = {
   id: string;
   title: string;
   description: string;
-  icon: ReactNode;
+  icon: React.ReactNode;
   color: string;
   getValue: () => string | number;
   getMessage: () => string;
@@ -245,7 +244,6 @@ export default function SocialExportScreen() {
             Alert.alert('Content Ready', 'Please copy this content:\n\n' + message);
           }
         } catch {
-          // clipboard failed; fall back to showing content without referencing the error
           console.log('Clipboard copy failed, showing content');
           Alert.alert('Content Ready', 'Please copy this content:\n\n' + message);
         }
@@ -296,7 +294,6 @@ export default function SocialExportScreen() {
             Alert.alert('Content Ready', message);
           }
         } catch {
-          // clipboard failed; ignore error variable
           console.log('Clipboard copy failed, showing content');
           Alert.alert('Content Ready', message);
         }
@@ -445,7 +442,6 @@ export default function SocialExportScreen() {
                 Alert.alert('Content Ready', composed);
               }
             } catch {
-              // ignore clipboard error variable
               console.log('Clipboard copy failed, showing content');
               Alert.alert('Content Ready', composed);
             }

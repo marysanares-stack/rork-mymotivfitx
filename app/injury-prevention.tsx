@@ -12,9 +12,7 @@ import { ShieldAlert, Clock, Target, CheckCircle2, Star, TrendingUp } from 'luci
 import Colors from '@/constants/colors';
 import { useFitness } from '@/contexts/FitnessContext';
 
-
-
-interface Stretch {
+type Stretch = {
   id: string;
   name: string;
   duration: number;
@@ -23,7 +21,7 @@ interface Stretch {
   description: string;
   benefits: string[];
   recommended: boolean;
-}
+};
 
 const STRETCHES: Stretch[] = [
   {

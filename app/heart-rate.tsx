@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,23 +23,16 @@ export default function HeartRateScreen() {
 
   const heartbeatScale = useRef(new Animated.Value(1)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
-  const intervalRef = useRef<any | null>(null);
-  const timeoutRef = useRef<any | null>(null);
-  const animationRef = useRef<any | null>(null);
-  const isScanningRef = useRef(isScanning);
   const redValuesRef = useRef<number[]>([]);
   const scanStartTimeRef = useRef<number>(0);
   const frameCountRef = useRef(0);
 
-  // Keep a ref in sync so interval callbacks can observe current value
-  useEffect(() => {
-    isScanningRef.current = isScanning;
-  }, [isScanning]);
-
+  // heartbeatScale and progressAnim are Animated.Value refs that are stable
+  // across renders; we intentionally only react to changes in isScanning.
+   
   useEffect(() => {
     if (isScanning) {
-      // store the animation so we can stop it cleanly
-      animationRef.current = Animated.loop(
+      Animated.loop(
         Animated.sequence([
           Animated.timing(heartbeatScale, {
             toValue: 1.2,
@@ -52,39 +45,18 @@ export default function HeartRateScreen() {
             useNativeDriver: true,
           }),
         ])
-      );
-      animationRef.current.start();
+      ).start();
 
-      // reset progress then animate
-      progressAnim.setValue(0);
       Animated.timing(progressAnim, {
         toValue: 1,
         duration: 15000,
         useNativeDriver: false,
       }).start();
     } else {
-      if (animationRef.current) {
-        try {
-          animationRef.current.stop();
-        } catch {
-          // swallow any stop errors - stop is best-effort
-        }
-        animationRef.current = null;
-      }
       heartbeatScale.setValue(1);
       progressAnim.setValue(0);
     }
-
-    return () => {
-      if (animationRef.current) {
-        try {
-          animationRef.current.stop();
-        } catch {
-        }
-        animationRef.current = null;
-      }
-    };
-  }, [isScanning, heartbeatScale, progressAnim]);
+  }, [isScanning]);
 
   const startScanning = () => {
     console.log('Starting heart rate scan');
@@ -95,53 +67,27 @@ export default function HeartRateScreen() {
     scanStartTimeRef.current = Date.now();
     frameCountRef.current = 0;
 
-    intervalRef.current = setInterval(() => {
-      // read the current scanning flag from ref so stopScanning() can
-      // reliably cancel the interval immediately
-      if (!isScanningRef.current) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
+    const interval = setInterval(() => {
+      if (!isScanning) {
+        clearInterval(interval);
         return;
       }
       processFrame(null);
     }, 100);
 
-    timeoutRef.current = setTimeout(() => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      if (isScanningRef.current) {
+    setTimeout(() => {
+      clearInterval(interval);
+      if (isScanning) {
         stopScanning();
       }
-      timeoutRef.current = null;
     }, 15000);
   };
 
   const stopScanning = () => {
     console.log('Stopping heart rate scan');
-    // Clear interval/timeout and stop any running animation immediately
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    if (animationRef.current) {
-      try {
-        animationRef.current.stop();
-      } catch {
-      }
-      animationRef.current = null;
-    }
-
     setIsScanning(false);
     setScanProgress(0);
-
+    
     if (redValuesRef.current.length > 0) {
       const calculatedBPM = calculateHeartRate(redValuesRef.current);
       if (calculatedBPM > 0 && calculatedBPM < 200) {
@@ -189,6 +135,8 @@ export default function HeartRateScreen() {
     const elapsed = (now - scanStartTimeRef.current) / 1000;
     
     setScanProgress(Math.min((elapsed / 15) * 100, 100));
+
+    const simulatedBPM = 65 + Math.sin(elapsed * 1.5) * 15;
     const simulatedRed = 128 + Math.sin(frameCountRef.current * 0.1) * 20;
     redValuesRef.current.push(simulatedRed);
   };
