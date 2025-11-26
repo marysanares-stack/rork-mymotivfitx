@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { publicProcedure } from '../../../create-context';
 import { prisma } from '../../../../prisma/client';
-import { TRPCError } from '@trpc/server';
 
 const UserSchema = z.object({
   id: z.string(),
@@ -20,9 +19,9 @@ export default {
   get: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
-  const user = await prisma.user.findUnique({ where: { id: input.userId } });
-  if (!user) throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
-  return user;
+      const user = await prisma.user.findUnique({ where: { id: input.userId } });
+      if (!user) throw new Error('User not found');
+      return user;
     }),
 
   update: publicProcedure
